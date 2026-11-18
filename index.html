@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNPAR Lab Inventory Management System</title>
+<style>
+:root{--navy:#14285a;--navy2:#1d3a7a;--light:#e6f0fb;--accent:#4a90d9;--bg:#f4f6fa;--gray:#6b7280;--line:#e2e6ee;--ok:#16a34a;--warn:#d97706;--bad:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#1f2937;font-size:14px}
+button,input,select,textarea{font:inherit}
+.btn{border:0;border-radius:6px;padding:8px 14px;cursor:pointer;background:var(--navy);color:#fff}
+.btn:hover{background:var(--navy2)}.btn.sec{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.sec:hover{background:var(--light)}
+.btn.sm{padding:4px 9px;font-size:12px}.btn.red{background:var(--bad)}.btn.green{background:var(--ok)}
+input,select,textarea{border:1px solid var(--line);border-radius:6px;padding:8px;background:#fff;width:100%}
+label{display:block;font-size:12px;color:var(--gray);margin:10px 0 3px}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--accent))}
+.lbox{background:#fff;border-radius:12px;padding:32px;width:380px;max-width:92vw;text-align:center}
+.logo{width:56px;height:56px;border-radius:12px;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;margin-bottom:8px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:8px}
+#app{display:none;min-height:100vh}
+aside{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--navy);color:#fff;padding:16px 0;z-index:20;transition:.2s}
+aside .brand{padding:0 18px 16px;font-weight:700;font-size:13px;border-bottom:1px solid #ffffff22;margin-bottom:8px}
+aside a{display:block;padding:10px 18px;color:#cbd8f0;cursor:pointer;text-decoration:none}
+aside a:hover,aside a.on{background:#ffffff18;color:#fff;border-left:3px solid var(--accent);padding-left:15px}
+main{margin-left:230px}
+header{background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+header .sp{flex:1}.avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+#burger{display:none}
+.content{padding:20px}
+h2{margin:0 0 14px;color:var(--navy)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat b{display:block;font-size:26px;color:var(--navy)}.stat span{color:var(--gray);font-size:12px}
+.labs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.lab{cursor:pointer;transition:.15s}.lab:hover{box-shadow:0 4px 14px #14285a22;transform:translateY(-2px)}
+.lab .ic{font-size:34px;background:var(--light);width:60px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.lab p{color:var(--gray);margin:4px 0 10px;font-size:13px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.tools input{width:220px}.tools select{width:auto}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{padding:7px 14px;border-radius:20px;background:#fff;border:1px solid var(--line);cursor:pointer}.tab.on{background:var(--navy);color:#fff}
+.tw{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:1100px}
+th{background:#eef2f9;color:var(--navy);text-align:left;padding:8px 10px;border:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+th.s{cursor:pointer}td{padding:7px 10px;border:1px solid var(--line)}
+tr:nth-child(even) td{background:#fafbfd}
+.badge{padding:2px 9px;border-radius:12px;font-size:12px;white-space:nowrap;display:inline-block}
+.b-g{background:#dcfce7;color:#166534}.b-y{background:#fef3c7;color:#92400e}.b-r{background:#fee2e2;color:#991b1b}.b-b{background:var(--light);color:var(--navy)}.b-x{background:#e5e7eb;color:#374151}
+.pg{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:10px}
+.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+.mbox{background:#fff;border-radius:12px;padding:22px;width:560px;max-width:100%;max-height:92vh;overflow:auto}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.dl{display:grid;grid-template-columns:150px 1fr;gap:6px 10px}.dl dt{color:var(--gray)}.dl dd{margin:0}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;display:none;z-index:99}
+.form{max-width:640px}
+@media(max-width:800px){aside{transform:translateX(-100%)}aside.open{transform:none}main{margin-left:0}#burger{display:block}.g2{grid-template-columns:1fr}}
+@media print{aside,header,.tools,.pg,.tabs,.noprint{display:none!important}main{margin:0}}
+</style>
+</head>
+<body>
+
+<div id="login">
+ <div class="lbox">
+  <div class="logo">UNPAR</div>
+  <h3 style="margin:4px 0;color:#14285a">UNPAR LAB INVENTORY MANAGEMENT SYSTEM</h3>
+  <p style="color:#6b7280;margin-top:0">Sistem Informasi Inventaris dan Peminjaman Peralatan Laboratorium</p>
+  <label style="text-align:left">Email UNPAR</label>
+  <input id="lemail" type="email" placeholder="nama@unpar.ac.id">
+  <label style="text-align:left">Hak akses (mode demo)</label>
+  <select id="lrole">
+   <option value="user">User (mahasiswa/dosen)</option>
+   <option value="admin:PP">Admin Lab Proses Produksi</option>
+   <option value="admin:EPSK">Admin Lab EPSK</option>
+   <option value="admin:PSTI">Admin Lab PSTI</option>
+   <option value="admin:STAT">Admin Lab Statistika</option>
+   <option value="super">Super Admin</option>
+  </select>
+  <button class="btn" style="width:100%;margin-top:14px" onclick="doLogin()">Login dengan Google UNPAR</button>
+  <div class="err" id="lerr"></div>
+  <small style="color:#9ca3af">Mode demo: Google OAuth &amp; Supabase belum terhubung. Hanya email @unpar.ac.id yang diterima.</small>
+ </div>
+</div>
+
+<div id="app">
+ <aside id="side">
+  <div class="brand">UNPAR LAB INVENTORY</div>
+  <div id="menu"></div>
+ </aside>
+ <main>
+  <header>
+   <button class="btn sec sm" id="burger" onclick="document.getElementById('side').classList.toggle('open')">☰</button>
+   <div class="logo" style="width:34px;height:34px;font-size:9px;margin:0">UNPAR</div>
+   <b style="color:var(--navy)">Lab Inventory</b>
+   <span class="sp"></span>
+   <div style="text-align:right;line-height:1.2"><b id="hname"></b><br><small id="hmail" style="color:var(--gray)"></small></div>
+   <div class="avatar" id="hav"></div>
+   <button class="btn sec sm" onclick="logout()">Logout</button>
+  </header>
+  <div class="content" id="view"></div>
+ </main>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target==this)closeM()"><div class="mbox" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA LAYER (localStorage; ganti dengan Supabase pada tahap backend) ============ */
+const LABS=[
+ {id:'PP',name:'Lab Proses Produksi',icon:'🏭',desc:'Peralatan permesinan, pengukuran, dan proses manufaktur.'},
+ {id:'EPSK',name:'Lab EPSK',icon:'⚙️',desc:'Ergonomi, perancangan sistem kerja, dan pengukuran kerja.'},
+ {id:'PSTI',name:'Lab PSTI',icon:'💻',desc:'Perancangan sistem teknik industri dan komputasi.'},
+ {id:'STAT',name:'Lab Statistika',icon:'📊',desc:'Analisis data, statistika, dan pengendalian kualitas.'}];
+const CATS=['Mesin','Alat Ukur','Elektronik','Komputer','Perkakas','Lainnya'];
+function seed(){
+ const r=(lab,rows)=>rows.map((x,i)=>({id:lab+(i+1),lab,code:lab+String(i+1).padStart(3,'0'),name:x[0],cat:x[1],spec:x[2],brand:x[3],total:x[4],avail:x[5],unit:x[6]||'unit',cond:x[7]||'Baik',loc:x[8],note:x[9]||''}));
+ return [
+ ...r('PP',[['Mesin Bubut','Mesin','Panjang bed 1000 mm','Krisbow',2,2,'unit','Baik','Rak A1'],['Mesin Milling','Mesin','3-axis, meja 800x240','Krisbow',1,1,'unit','Baik','Rak A2'],['Jangka Sorong','Alat Ukur','0-150 mm, 0.02 mm','Mitutoyo',10,10,'buah','Baik','Lemari B1'],['Mikrometer','Alat Ukur','0-25 mm','Mitutoyo',5,0,'buah','Perawatan','Lemari B1','Sedang kalibrasi'],['Mesin Gerinda','Mesin','Gerinda duduk 8"','Bosch',2,2,'unit','Baik','Rak A3'],['Mesin Bor Duduk','Mesin','13 mm, 5 speed','Krisbow',3,3,'unit','Baik','Rak A4'],['Kunci Pas Set','Perkakas','Set 14 pcs','Tekiro',6,6,'set','Baik','Lemari C1']]),
+ ...r('EPSK',[['Stopwatch Digital','Alat Ukur','Presisi 0.01 detik','Casio',12,12,'buah','Baik','Lemari 1'],['Sound Level Meter','Alat Ukur','30-130 dB','Lutron',2,2,'unit','Baik','Lemari 2'],['Lux Meter','Alat Ukur','0-200.000 lux','Lutron',3,3,'unit','Baik','Lemari 2'],['Hand Dynamometer','Alat Ukur','0-90 kg','Camry',4,4,'unit','Baik','Lemari 3'],['Antropometer','Alat Ukur','Tinggi hingga 2 m','GPM',2,2,'unit','Baik','Lemari 3'],['Heart Rate Monitor','Elektronik','Bluetooth','Polar',5,5,'unit','Baik','Lemari 4'],['Kamera Video','Elektronik','Full HD','Sony',2,1,'unit','Baik','Lemari 4']]),
+ ...r('PSTI',[['PC Desktop','Komputer','Core i7, 16 GB RAM','Dell',30,30,'unit','Baik','Ruang Komputer'],['Laptop Peminjaman','Komputer','Core i5, 8 GB RAM','Asus',8,8,'unit','Baik','Lemari 1'],['Proyektor','Elektronik','4000 lumens','Epson',3,3,'unit','Baik','Lemari 2'],['Arduino Uno Kit','Elektronik','ATmega328P','Arduino',10,10,'set','Baik','Lemari 3'],['Raspberry Pi 4','Elektronik','4 GB RAM','Raspberry Pi',6,6,'unit','Baik','Lemari 3'],['3D Printer','Mesin','FDM 220x220x250','Creality',2,2,'unit','Baik','Meja Khusus'],['Router Jaringan','Elektronik','Gigabit','TP-Link',4,4,'unit','Rusak Ringan','Lemari 4']]),
+ ...r('STAT',[['Komputer Analisis','Komputer','Core i7, 32 GB RAM','HP',20,20,'unit','Baik','Ruang Utama'],['Kalkulator Ilmiah','Alat Ukur','fx-991','Casio',25,25,'buah','Baik','Lemari 1'],['Lisensi Minitab','Lainnya','Lisensi kampus','Minitab',1,1,'lisensi','Baik','-'],['Timbangan Digital','Alat Ukur','0.01 g','Ohaus',3,3,'unit','Baik','Lemari 2'],['Papan Kontrol Dadu','Lainnya','Set simulasi sampling','-',6,6,'set','Baik','Lemari 3'],['Tablet Survei','Elektronik','10 inci','Samsung',10,10,'unit','Baik','Lemari 4'],['Printer Laser','Elektronik','A4 mono','Brother',2,2,'unit','Perawatan','Ruang Utama']])
+ ];
+}
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let ITEMS=load('ul_items',null)||seed(); save('ul_items',ITEMS);
+let LOANS=load('ul_loans',[]);
+let LOGS=load('ul_logs',[]);
+let ME=load('ul_me',null);
+const saveAll=()=>{save('ul_items',ITEMS);save('ul_loans',LOANS);save('ul_logs',LOGS)};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const labName=id=>LABS.find(l=>l.id===id)?.name||id;
+const isSuper=()=>ME.role==='super';
+const canManage=lab=>isSuper()||(ME.role==='admin'&&ME.lab===lab);
+const isAdmin=()=>ME.role==='admin'||ME.role==='super';
+function log(a,item,d){LOGS.unshift({t:new Date().toISOString(),by:ME.email,a,item,d});LOGS=LOGS.slice(0,300);saveAll()}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function status(i){if(i.cond==='Perawatan')return['Perawatan','b-y'];if(i.avail<=0)return['Dipinjam','b-r'];return['Tersedia','b-g']}
+function condBadge(c){return `<span class="badge ${c==='Baik'?'b-g':c==='Perawatan'?'b-y':'b-r'}">${esc(c)}</span>`}
+
+/* ============ AUTH ============ */
+function doLogin(){
+ const email=document.getElementById('lemail').value.trim().toLowerCase();
+ const err=document.getElementById('lerr');
+ if(!/^[^\s@]+@unpar\.ac\.id$/.test(email)){err.textContent='Akses ditolak: gunakan email resmi @unpar.ac.id.';return}
+ const r=document.getElementById('lrole').value;
+ const name=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+ ME={email,name,role:r==='user'?'user':r==='super'?'super':'admin',lab:r.startsWith('admin:')?r.split(':')[1]:null};
+ save('ul_me',ME);start();
+}
+function logout(){ME=null;try{localStorage.removeItem('ul_me')}catch(e){}document.getElementById('app').style.display='none';document.getElementById('login').style.display='flex'}
+function start(){
+ document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';
+ document.getElementById('hname').textContent=ME.name;document.getElementById('hmail').textContent=ME.email+' · '+(ME.role==='super'?'Super Admin':ME.role==='admin'?'Admin '+labName(ME.lab):'User');
+ document.getElementById('hav').textContent=ME.name[0];
+ const m=[['dashboard','🏠 Dashboard'],['labs','🧪 Daftar Laboratorium'],['inv','📦 Inventaris'],['borrow','📝 Peminjaman Alat'],['history','🕘 Riwayat Peminjaman'],['report','📈 Laporan']];
+ if(isAdmin())m.push(['logs','🗂️ Log Aktivitas']);
+ document.getElementById('menu').innerHTML=m.map(x=>`<a data-p="${x[0]}" onclick="go('${x[0]}')">${x[1]}</a>`).join('')+`<a onclick="logout()">🚪 Logout</a>`;
+ go(location.hash.slice(1).split('/')[0]||'dashboard');
+}
+
+/* ============ ROUTER ============ */
+let INV={lab:'PP',q:'',cat:'',cond:'',st:'',sort:'name',dir:1,page:1};
+function go(p,arg){
+ document.getElementById('side').classList.remove('open');
+ if(p==='inv'&&arg)INV={...INV,lab:arg,q:'',cat:'',cond:'',st:'',page:1};
+ location.hash=p;
+ document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));
+ const v=document.getElementById('view');
+ ({dashboard:vDash,labs:vLabs,inv:vInv,borrow:vBorrow,history:vHist,report:vReport,logs:vLogs}[p]||vDash)(v);
+ window.scrollTo(0,0);
+}
+const labStats=id=>{const a=ITEMS.filter(i=>i.lab===id);return{types:a.length,total:a.reduce((s,i)=>s+i.total,0),avail:a.reduce((s,i)=>s+i.avail,0)}};
+
+/* ============ DASHBOARD ============ */
+function labCards(){return `<div class="labs">`+LABS.map(l=>{const s=labStats(l.id);return `<div class="card lab" onclick="go('inv','${l.id}')"><div class="ic">${l.icon}</div><b>${l.name}</b><p>${l.desc}</p><small>${s.types} jenis barang · ${s.avail} unit tersedia</small><br><br><button class="btn sm">Lihat Inventaris</button></div>`}).join('')+`</div>`}
+function vDash(v){
+ const total=ITEMS.reduce((s,i)=>s+i.total,0),avail=ITEMS.reduce((s,i)=>s+i.avail,0);
+ const pend=LOANS.filter(l=>l.status==='Menunggu Persetujuan').length;
+ const st=[['Total Laboratorium',LABS.length],['Total Jenis Barang',ITEMS.length],['Total Unit Barang',total],['Barang Tersedia',avail],['Sedang Dipinjam',total-avail],['Menunggu Persetujuan',pend]];
+ v.innerHTML=`<h2>Dashboard</h2><p style="color:var(--gray);margin-top:-8px">Selamat datang, ${esc(ME.name)}.</p><div class="cards">${st.map(s=>`<div class="card stat"><b>${s[1]}</b><span>${s[0]}</span></div>`).join('')}</div><h3 style="color:var(--navy)">Laboratorium</h3>${labCards()}`;
+}
+function vLabs(v){v.innerHTML=`<h2>Daftar Laboratorium</h2>${labCards()}`}
+
+/* ============ INVENTARIS ============ */
+function vInv(v){
+ const lab=INV.lab;
+ v.innerHTML=`<h2>INVENTARIS ${labName(lab).replace('Lab ','LABORATORIUM ').toUpperCase()}</h2>
+ <div class="tabs">${LABS.map(l=>`<div class="tab ${l.id===lab?'on':''}" onclick="go('inv','${l.id}')">${l.name}</div>`).join('')}</div>
+ <div class="tools">
+  <input id="iq" placeholder="🔍 Cari nama / kode barang" value="${esc(INV.q)}" oninput="INV.q=this.value;INV.page=1;drawTable()">
+  <select onchange="INV.cat=this.value;INV.page=1;drawTable()"><option value="">Semua kategori</option>${CATS.map(c=>`<option ${INV.cat===c?'selected':''}>${c}</option>`).join('')}</select>
+  <select onchange="INV.cond=this.value;INV.page=1;drawTable()"><option value="">Semua kondisi</option>${['Baik','Perawatan','Rusak Ringan','Rusak Berat'].map(c=>`<option ${INV.cond===c?'selected':''}>${c}</option>`).join('')}</select>
+  <select onchange="INV.st=this.value;INV.page=1;drawTable()"><option value="">Semua status</option>${['Tersedia','Dipinjam','Perawatan'].map(c=>`<option ${INV.st===c?'selected':''}>${c}</option>`).join('')}</select>
+  <span style="flex:1"></span>
+  <button class="btn sec" onclick="exportXls()">⬇ Export Excel</button>
+  <button class="btn sec" onclick="window.print()">⬇ Export PDF</button>
+  ${canManage(lab)?`<button class="btn sec" onclick="importM()">⬆ Import</button><button class="btn" onclick="itemForm()">＋ Tambah Barang</button>`:''}
+ </div><div id="tbl"></div>`;
+ drawTable();
+}
+function filtered(){
+ const q=INV.q.toLowerCase();
+ return ITEMS.filter(i=>i.lab===INV.lab&&(!q||i.name.toLowerCase().includes(q)||i.code.toLowerCase().includes(q))&&(!INV.cat||i.cat===INV.cat)&&(!INV.cond||i.cond===INV.cond)&&(!INV.st||status(i)[0]===INV.st))
+ .sort((a,b)=>{const x=a[INV.sort],y=b[INV.sort];return (typeof x==='number'?x-y:String(x).localeCompare(y))*INV.dir});
+}
+function sortBy(k){INV.dir=INV.sort===k?-INV.dir:1;INV.sort=k;drawTable()}
+const PER=8;
+function drawTable(){
+ const all=filtered(),pages=Math.max(1,Math.ceil(all.length/PER));if(INV.page>pages)INV.page=pages;
+ const rows=all.slice((INV.page-1)*PER,INV.page*PER),adm=canManage(INV.lab);
+ const arrow=k=>INV.sort===k?(INV.dir>0?' ▲':' ▼'):'';
+ document.getElementById('tbl').innerHTML=`<div class="tw"><table><thead><tr><th>No.</th><th>Kode Barang</th><th class="s" onclick="sortBy('name')">Nama Barang${arrow('name')}</th><th>Kategori</th><th>Spesifikasi Barang</th><th>Merek/Tipe</th><th class="s" onclick="sortBy('total')">Jumlah Total${arrow('total')}</th><th class="s" onclick="sortBy('avail')">Jumlah Tersedia${arrow('avail')}</th><th>Satuan</th><th>Kondisi Barang</th><th>Lokasi Penyimpanan</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody>${
+ rows.map((i,n)=>{const s=status(i);return `<tr><td>${(INV.page-1)*PER+n+1}</td><td><b>${esc(i.code)}</b></td><td>${esc(i.name)}</td><td>${esc(i.cat)}</td><td>${esc(i.spec)}</td><td>${esc(i.brand)}</td><td>${i.total}</td><td>${i.avail}</td><td>${esc(i.unit)}</td><td>${condBadge(i.cond)}</td><td>${esc(i.loc)}</td><td><span class="badge ${s[1]}">${s[0]}</span></td><td>${esc(i.note)}</td><td style="white-space:nowrap"><button class="btn sec sm" onclick="detail('${i.id}')">Detail</button>${adm?` <button class="btn sec sm" onclick="itemForm('${i.id}')">Edit</button> <button class="btn red sm" onclick="delItem('${i.id}')">Hapus</button>`:''}</td></tr>`}).join('')||`<tr><td colspan="14" style="text-align:center;padding:24px;color:var(--gray)">Tidak ada barang ditemukan.</td></tr>`}</tbody></table></div>
+ <div class="pg"><span style="color:var(--gray)">${all.length} barang</span><button class="btn sec sm" ${INV.page<=1?'disabled':''} onclick="INV.page--;drawTable()">‹</button><span>Hal ${INV.page}/${pages}</span><button class="btn sec sm" ${INV.page>=pages?'disabled':''} onclick="INV.page++;drawTable()">›</button></div>`;
+}
+function openM(h){document.getElementById('mbox').innerHTML=h;document.getElementById('modal').style.display='flex'}
+function closeM(){document.getElementById('modal').style.display='none'}
+function detail(id){
+ const i=ITEMS.find(x=>x.id===id),s=status(i);
+ openM(`<h3 style="margin-top:0;color:var(--navy)">${esc(i.name)}</h3>
+ <div style="background:var(--light);border-radius:8px;height:110px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:12px">📷</div>
+ <dl class="dl"><dt>Kode inventaris</dt><dd>${esc(i.code)}</dd><dt>Laboratorium</dt><dd>${labName(i.lab)}</dd><dt>Kategori</dt><dd>${esc(i.cat)}</dd><dt>Merek / tipe</dt><dd>${esc(i.brand)}</dd><dt>Spesifikasi</dt><dd>${esc(i.spec)}</dd><dt>Jumlah total</dt><dd>${i.total} ${esc(i.unit)}</dd><dt>Jumlah tersedia</dt><dd>${i.avail} ${esc(i.unit)}</dd><dt>Kondisi</dt><dd>${condBadge(i.cond)}</dd><dt>Lokasi</dt><dd>${esc(i.loc)}</dd><dt>Status</dt><dd><span class="badge ${s[1]}">${s[0]}</span></dd><dt>Keterangan</dt><dd>${esc(i.note)||'-'}</dd></dl>
+ <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" onclick="closeM()">Tutup</button>${s[0]==='Tersedia'?`<button class="btn" onclick="closeM();go('borrow');preBorrow('${i.id}')">Ajukan Peminjaman</button>`:''}</div>`);
+}
+function itemForm(id){
+ const i=id?ITEMS.find(x=>x.id===id):{lab:INV.lab,name:'',cat:CATS[0],spec:'',brand:'',total:1,avail:1,unit:'unit',cond:'Baik',loc:'',note:'',code:''};
+ const f=(k,l,t='text')=>`<div><label>${l}</label><input id="f_${k}" type="${t}" value="${esc(i[k])}"></div>`;
+ openM(`<h3 style="margin-top:0">${id?'Edit':'Tambah'} Barang — ${labName(i.lab)}</h3><div class="g2">${f('code','Kode Barang (kosong = otomatis)')}${f('name','Nama Barang')}
+ <div><label>Kategori</label><select id="f_cat">${CATS.map(c=>`<option ${i.cat===c?'selected':''}>${c}</option>`).join('')}</select></div>${f('brand','Merek/Tipe')}${f('total','Jumlah Total','number')}${f('avail','Jumlah Tersedia','number')}${f('unit','Satuan')}
+ <div><label>Kondisi</label><select id="f_cond">${['Baik','Perawatan','Rusak Ringan','Rusak Berat'].map(c=>`<option ${i.cond===c?'selected':''}>${c}</option>`).join('')}</select></div>${f('loc','Lokasi Penyimpanan')}${f('spec','Spesifikasi')}</div>${f('note','Keterangan')}
+ <div style="margin-top:14px;text-align:right"><button class="btn sec" onclick="closeM()">Batal</button> <button class="btn" onclick="saveItem('${id||''}')">Simpan</button></div>`);
+}
+function saveItem(id){
+ const g=k=>document.getElementById('f_'+k).value.trim();
+ const o={name:g('name'),cat:g('cat'),brand:g('brand'),total:+g('total'),avail:+g('avail'),unit:g('unit')||'unit',cond:g('cond'),loc:g('loc'),spec:g('spec'),note:g('note')};
+ if(!o.name)return toast('Nama barang wajib diisi');
+ if(!(o.total>=0)||!(o.avail>=0)||o.avail>o.total)return toast('Jumlah tersedia tidak boleh melebihi jumlah total');
+ if(id){const i=ITEMS.find(x=>x.id===id);Object.assign(i,o);if(g('code'))i.code=g('code');log('Edit barang',i.code,'')}
+ else{const n=ITEMS.filter(x=>x.lab===INV.lab).length+1;const code=g('code')||INV.lab+String(n).padStart(3,'0');
+  if(ITEMS.some(x=>x.lab===INV.lab&&x.code===code))return toast('Kode barang sudah dipakai');
+  ITEMS.push({id:INV.lab+Date.now(),lab:INV.lab,code,...o});log('Tambah barang',code,o.name)}
+ saveAll();closeM();drawTable();toast('Data tersimpan');
+}
+function delItem(id){const i=ITEMS.find(x=>x.id===id);if(!confirm('Hapus '+i.name+'?'))return;
+ if(LOANS.some(l=>l.itemId===id&&['Menunggu Persetujuan','Disetujui','Sedang Dipinjam','Terlambat'].includes(l.status)))return toast('Barang masih terkait peminjaman aktif');
+ ITEMS=ITEMS.filter(x=>x.id!==id);log('Hapus barang',i.code,i.name);saveAll();drawTable()}
+function csvCell(s){return '"'+String(s??'').replace(/"/g,'""')+'"'}
+function exportXls(){
+ const h=['No.','Kode Barang','Nama Barang','Kategori','Spesifikasi Barang','Merek/Tipe','Jumlah Total','Jumlah Tersedia','Satuan','Kondisi Barang','Lokasi Penyimpanan','Status','Keterangan'];
+ const rows=ITEMS.filter(i=>i.lab===INV.lab).map((i,n)=>[n+1,i.code,i.name,i.cat,i.spec,i.brand,i.total,i.avail,i.unit,i.cond,i.loc,status(i)[0],i.note]);
+ dl('inventaris_'+INV.lab+'.csv',[h,...rows]);
+}
+function dl(name,data){const b=new Blob(['\ufeff'+data.map(r=>r.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
+function importM(){openM(`<h3 style="margin-top:0">Import Inventaris — ${labName(INV.lab)}</h3><p>Unggah file <b>.csv</b> dengan kolom sama seperti hasil Export (Kode, Nama, Kategori, Spesifikasi, Merek, Total, Tersedia, Satuan, Kondisi, Lokasi, Status, Keterangan). Import .xlsx tersedia pada tahap backend.</p><input type="file" id="ifile" accept=".csv"><div style="margin-top:14px;text-align:right"><button class="btn sec" onclick="closeM()">Batal</button> <button class="btn" onclick="doImport()">Import</button></div>`)}
+function parseCSV(t){const r=[];let row=[],c='',q=false;for(let k=0;k<t.length;k++){const ch=t[k];if(q){if(ch==='"'&&t[k+1]==='"'){c+='"';k++}else if(ch==='"')q=false;else c+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(c);c=''}else if(ch==='\n'){row.push(c.replace(/\r$/,''));r.push(row);row=[];c=''}else c+=ch}if(c||row.length){row.push(c);r.push(row)}return r}
+function doImport(){
+ const f=document.getElementById('ifile').files[0];if(!f)return toast('Pilih file dahulu');
+ f.text().then(t=>{const rows=parseCSV(t.replace(/^\ufeff/,'')).slice(1).filter(r=>r.length>=9);let n=0;
+  rows.forEach(r=>{const o={code:r[1],name:r[2],cat:r[3]||'Lainnya',spec:r[4],brand:r[5],total:+r[6]||0,avail:+r[7]||0,unit:r[8]||'unit',cond:r[9]||'Baik',loc:r[10]||'',note:r[12]||''};
+   if(!o.code||!o.name||o.avail>o.total)return;const ex=ITEMS.find(x=>x.lab===INV.lab&&x.code===o.code);
+   if(ex)Object.assign(ex,o);else ITEMS.push({id:INV.lab+Date.now()+n,lab:INV.lab,...o});n++});
+  log('Import',labName(INV.lab),n+' baris');saveAll();closeM();drawTable();toast(n+' baris diimpor')});
+}
+
+/* ============ PEMINJAMAN ============ */
+function vBorrow(v){
+ const today=new Date().toISOString().slice(0,10);
+ v.innerHTML=`<h2>Peminjaman Alat</h2><div class="card form"><div class="g2">
+ <div><label>Nama peminjam</label><input value="${esc(ME.name)}" disabled></div><div><label>Email UNPAR</label><input value="${esc(ME.email)}" disabled></div>
+ <div><label>NPM/NIP</label><input id="b_id"></div><div><label>Program studi / unit</label><input id="b_prodi"></div>
+ <div><label>Laboratorium</label><select id="b_lab" onchange="fillItems()">${LABS.map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select></div>
+ <div><label>Barang</label><select id="b_item" onchange="showCode()"></select></div>
+ <div><label>Kode barang</label><input id="b_code" disabled></div><div><label>Jumlah (<span id="b_max">-</span>)</label><input id="b_qty" type="number" min="1" value="1"></div>
+ <div><label>Tanggal peminjaman</label><input id="b_d1" type="date" min="${today}" value="${today}"></div><div><label>Tanggal pengembalian</label><input id="b_d2" type="date" min="${today}"></div></div>
+ <label>Tujuan peminjaman</label><input id="b_goal"><label>Keterangan tambahan</label><textarea id="b_note" rows="2"></textarea>
+ <div style="margin-top:14px"><button class="btn" onclick="submitBorrow()">Kirim Pengajuan</button></div></div>`;
+ fillItems();
+}
+function fillItems(sel){
+ const lab=document.getElementById('b_lab').value;
+ document.getElementById('b_item').innerHTML=ITEMS.filter(i=>i.lab===lab&&status(i)[0]==='Tersedia').map(i=>`<option value="${i.id}" ${i.id===sel?'selected':''}>${esc(i.name)} (${i.avail} tersedia)</option>`).join('')||'<option value="">— tidak ada barang tersedia —</option>';
+ showCode();
+}
+function showCode(){const i=ITEMS.find(x=>x.id===document.getElementById('b_item').value);document.getElementById('b_code').value=i?i.code:'';document.getElementById('b_max').textContent=i?'maks '+i.avail:'-'}
+function preBorrow(id){const i=ITEMS.find(x=>x.id===id);document.getElementById('b_lab').value=i.lab;fillItems(id)}
+function submitBorrow(){
+ const g=k=>document.getElementById('b_'+k).value.trim();
+ const item=ITEMS.find(x=>x.id===g('item'));
+ if(!item)return toast('Pilih barang yang tersedia');
+ if(!g('id')||!g('prodi')||!g('goal'))return toast('NPM/NIP, program studi, dan tujuan wajib diisi');
+ const q=+g('qty');if(!(q>=1)||q>item.avail)return toast('Jumlah melebihi stok tersedia ('+item.avail+')');
+ if(!g('d2')||g('d2')<g('d1'))return toast('Tanggal pengembalian tidak valid');
+ const n=LOANS.length+1,no='TRX-'+new Date().getFullYear()+'-'+String(n).padStart(4,'0');
+ LOANS.unshift({no,name:ME.name,email:ME.email,nid:g('id'),prodi:g('prodi'),lab:item.lab,itemId:item.id,itemName:item.name,code:item.code,qty:q,d1:g('d1'),d2:g('d2'),goal:g('goal'),note:g('note'),status:'Menunggu Persetujuan',reason:'',deducted:false});
+ saveAll();toast('Pengajuan terkirim: '+no);go('history');
+}
+const LS={'Menunggu Persetujuan':'b-y','Disetujui':'b-b','Ditolak':'b-r','Sedang Dipinjam':'b-b','Menunggu Pengembalian':'b-y','Selesai':'b-g','Terlambat':'b-r'};
+function refreshLate(){const t=new Date().toISOString().slice(0,10);LOANS.forEach(l=>{if(['Sedang Dipinjam','Menunggu Pengembalian'].includes(l.status)&&l.d2<t)l.status='Terlambat'})}
+function visibleLoans(){refreshLate();return LOANS.filter(l=>isSuper()||(ME.role==='admin'&&l.lab===ME.lab)||l.email===ME.email)}
+function vHist(v){
+ const rows=visibleLoans();
+ v.innerHTML=`<h2>Riwayat Peminjaman</h2><div class="tools noprint"><button class="btn sec" onclick="dl('riwayat_peminjaman.csv',[['No Transaksi','Peminjam','Email','Lab','Barang','Jumlah','Tgl Pinjam','Tgl Kembali','Tujuan','Status'],...visibleLoans().map(l=>[l.no,l.name,l.email,labName(l.lab),l.itemName,l.qty,l.d1,l.d2,l.goal,l.status])])">⬇ Export Excel</button></div>
+ <div class="tw"><table><thead><tr><th>No. Transaksi</th><th>Peminjam</th><th>Email</th><th>Laboratorium</th><th>Barang</th><th>Jumlah</th><th>Tgl Pinjam</th><th>Tgl Kembali</th><th>Tujuan</th><th>Status</th>${isAdmin()?'<th>Aksi</th>':''}</tr></thead><tbody>${
+ rows.map(l=>`<tr><td>${l.no}</td><td>${esc(l.name)}</td><td>${esc(l.email)}</td><td>${labName(l.lab)}</td><td>${esc(l.itemName)}</td><td>${l.qty}</td><td>${l.d1}</td><td>${l.d2}</td><td>${esc(l.goal)}</td><td><span class="badge ${LS[l.status]}">${l.status}</span>${l.reason?`<br><small>${esc(l.reason)}</small>`:''}</td>${isAdmin()?`<td style="white-space:nowrap">${actions(l)}</td>`:''}</tr>`).join('')||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--gray)">Belum ada transaksi.</td></tr>`}</tbody></table></div>`;
+}
+function actions(l){
+ if(!canManage(l.lab))return '';
+ const b=(t,fn,c='')=>`<button class="btn sm ${c}" onclick="${fn}('${l.no}')">${t}</button> `;
+ if(l.status==='Menunggu Persetujuan')return b('Setujui','approve','green')+b('Tolak','reject','red');
+ if(l.status==='Disetujui')return b('Konfirmasi Diambil','pickup');
+ if(['Sedang Dipinjam','Menunggu Pengembalian','Terlambat'].includes(l.status))return b('Konfirmasi Kembali','giveBack','green');
+ return '';
+}
+const L=no=>LOANS.find(x=>x.no===no);
+function approve(no){const l=L(no);l.status='Disetujui';log('Setujui peminjaman',no,'');saveAll();go('history')}
+function reject(no){const r=prompt('Alasan penolakan:');if(!r)return;const l=L(no);l.status='Ditolak';l.reason='Ditolak: '+r;log('Tolak peminjaman',no,r);saveAll();go('history')}
+function pickup(no){
+ const l=L(no),i=ITEMS.find(x=>x.id===l.itemId);
+ if(!i||i.avail<l.qty)return toast('Stok tidak mencukupi saat ini');
+ i.avail-=l.qty;l.deducted=true;l.status='Sedang Dipinjam';log('Barang diserahkan',no,l.qty+' '+i.code);saveAll();go('history');
+}
+function giveBack(no){
+ const l=L(no),i=ITEMS.find(x=>x.id===l.itemId),c=prompt('Catatan kondisi barang saat dikembalikan (opsional):')??'';
+ if(i&&l.deducted)i.avail=Math.min(i.total,i.avail+l.qty);
+ l.deducted=false;l.status='Selesai';if(c)l.reason='Catatan: '+c;log('Barang dikembalikan',no,c);saveAll();go('history');
+}
+
+/* ============ LAPORAN & LOG ============ */
+function vReport(v){
+ const cnt=(arr,fn)=>arr.reduce((m,x)=>{const k=fn(x);m[k]=(m[k]||0)+1;return m},{});
+ const items=isSuper()?ITEMS:ME.role==='admin'?ITEMS.filter(i=>i.lab===ME.lab):ITEMS;
+ const tbl=(t,o)=>`<div class="card"><b>${t}</b><table style="min-width:0;margin-top:8px">${Object.entries(o).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table></div>`;
+ const labs={};LABS.forEach(l=>{const s=labStats(l.id);labs[l.name]=s.types+' jenis / '+s.total+' unit / '+s.avail+' tersedia'});
+ const pop={};LOANS.forEach(l=>pop[l.itemName]=(pop[l.itemName]||0)+l.qty);
+ const top=Object.fromEntries(Object.entries(pop).sort((a,b)=>b[1]-a[1]).slice(0,5));
+ v.innerHTML=`<h2>Laporan</h2><div class="tools noprint"><button class="btn sec" onclick="window.print()">⬇ Cetak / PDF</button></div><div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${tbl('Inventaris per laboratorium',labs)}${tbl('Barang per kategori',cnt(items,i=>i.cat))}${tbl('Barang per kondisi',cnt(items,i=>i.cond))}${tbl('Barang paling sering dipinjam (unit)',Object.keys(top).length?top:{'Belum ada data':'-'})}</div>`;
+}
+function vLogs(v){
+ v.innerHTML=`<h2>Log Aktivitas Admin</h2><div class="tw"><table><thead><tr><th>Waktu</th><th>Pengguna</th><th>Aktivitas</th><th>Objek</th><th>Detail</th></tr></thead><tbody>${LOGS.map(l=>`<tr><td>${new Date(l.t).toLocaleString('id-ID')}</td><td>${esc(l.by)}</td><td>${esc(l.a)}</td><td>${esc(l.item)}</td><td>${esc(l.d)}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--gray)">Belum ada aktivitas.</td></tr>'}</tbody></table></div>`;
+}
+
+if(ME&&/@unpar\.ac\.id$/.test(ME.email))start();
+</script>
+
+
+</body></html>
